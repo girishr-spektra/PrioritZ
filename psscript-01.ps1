@@ -34,8 +34,8 @@ Start-Transcript -Path C:\WindowsAzure\Logs\CloudLabsCustomScriptExtension.txt -
 [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls" 
 
 #Import Common Functions
-$path = pwd
-$path=$path.Path
+$path = $PSScriptRoot
+if ([string]::IsNullOrWhiteSpace($path)) { $path = (Get-Location).Path }
 $commonscriptpath = "$path" + "\cloudlabs-common\cloudlabs-windows-functions.ps1"
 . $commonscriptpath
   
@@ -55,17 +55,28 @@ sleep 5
 # sleep 5
 
 #Download student files
-New-Item -ItemType directory -Path C:\AzureInfraMonitoring
-$WebClient = New-Object System.Net.WebClient
-$WebClient.DownloadFile("https://github.com/CloudLabsAI-Azure/Infra_Monitoring_codefiles/archive/refs/heads/code-files.zip","C:\TollBooth_Clean.zip")
-#unziping folder
+# NOTE: must be a PUBLIC repo/branch - the VM has no GitHub credentials.
+$codeFilesZipUrl = "https://github.com/CloudLabsAI-Azure/Infra_Monitoring_codefiles/archive/refs/heads/code-files.zip"
 $file = "C:\TollBooth_Clean.zip"
 $destination = "C:\AzureInfraMonitoring"
-$shell = new-object -com shell.application
-$zip = $shell.NameSpace($file)
-foreach($item in $zip.items())
-{
-$shell.Namespace($destination).copyhere($item)
+
+New-Item -ItemType directory -Path $destination -Force | Out-Null
+try {
+    $WebClient = New-Object System.Net.WebClient
+    $WebClient.DownloadFile($codeFilesZipUrl, $file)
+    Write-Host "Downloaded student files from $codeFilesZipUrl"
+
+    #unziping folder
+    $shell = new-object -com shell.application
+    $zip = $shell.NameSpace($file)
+    foreach($item in $zip.items())
+    {
+    $shell.Namespace($destination).copyhere($item)
+    }
+}
+catch {
+    Write-Host "ERROR: could not download student files from $codeFilesZipUrl - $($_.Exception.Message)"
+    Write-Host "ERROR: $destination will be empty. Check the repo is public and the branch exists."
 }
 
 #Download and install .net runtime Framework 4.8
