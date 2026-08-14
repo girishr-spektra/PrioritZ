@@ -524,20 +524,6 @@
       }
     },
     {
-      "type": "Microsoft.Web/sites/sourcecontrols",
-      "apiVersion": "2021-02-01",
-      "name": "[concat(variables('tollBoothFunctionAppName'), '/web')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('tollBoothFunctionAppName'))]",
-        "[resourceId('Microsoft.Web/sites/basicPublishingCredentialsPolicies', variables('tollBoothFunctionAppName'), 'scm')]"
-      ],
-      "properties": {
-        "repoUrl": "https://github.com/CloudLabsAI-Azure/Infra_Monitoring_codefiles",
-        "branch": "main",
-        "isManualIntegration": true
-      }
-    },
-    {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2020-06-01",
       "name": "[variables('tollBoothEventsHostingPlanName')]",
@@ -565,7 +551,7 @@
         "[resourceId('Microsoft.Web/serverfarms', variables('tollBoothEventsHostingPlanName'))]",
         "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('nodeStorageAccountName'))]",
-        "[resourceId('Microsoft.Web/sites/sourcecontrols', variables('tollBoothFunctionAppName'), 'web')]"
+        "[resourceId('Microsoft.Web/sites/basicPublishingCredentialsPolicies', variables('tollBoothFunctionAppName'), 'ftp')]"
       ],
       "properties": {
         "name": "[variables('tollBoothEventsFunctionAppName')]",
@@ -683,9 +669,9 @@
             "settings": {
               "fileUris": [
                 "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1",
-                "https://experienceazure.blob.core.windows.net/templates/azure-infra-migration-litm/scripts/psscript-01.ps1"
+                "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/refs/heads/main/psscript-01.ps1"
               ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File azure-infra-migration-litm/scripts/psscript-01.ps1', variables('cloudlabsCommon'),variables('Enable-CloudLabsEmbeddedShadow'))]"
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File psscript-01.ps1', variables('cloudlabsCommon'),variables('Enable-CloudLabsEmbeddedShadow'))]"
             }
           },
           "dependsOn": [
