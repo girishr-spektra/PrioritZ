@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmUsername": {
+            "value": "demouser"
+        },
+        "vmPassword": {
+            "value": "GEN-PASSWORD"
+        },
+        "signedInUserObjectId": {
+            "value": "GET-AZUSER-OBJECTID"
+        },
+        "AzureUserName": {
+            "value": "GET-AZUSER-UPN"
+        },
+        "AzurePassword": {
+            "value": "GET-AZUSER-PASSWORD"
+        },
+        "DeploymentID": {
+            "value": "GET-DEPLOYMENT-ID"
+        },
+        "trainerUserName": {
+            "value": "trainer"
+        },
+        "trainerUserPassword": {
+            "value": "GEN-PASSWORD"
+        }
+    }
+}
