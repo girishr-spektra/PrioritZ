@@ -25,6 +25,9 @@
         },
         "trainerUserPassword": {
             "value": "GEN-PASSWORD"
+        },
+        "tollBoothFunctionsPackageUrl": {
+            "value": ""
         }
     }
 }

@@ -35,6 +35,13 @@
     },
     "trainerUserPassword": {
       "type": "securestring"
+    },
+    "tollBoothFunctionsPackageUrl": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Public URL (or SAS URL) of the zipped 'dotnet publish' output of the TollBooth project (Infra_Monitoring_codefiles, guided-labs branch). It is run with WEBSITE_RUN_FROM_PACKAGE so ProcessImage is available when the lab starts. Leave empty to skip."
+      }
     }
   },
   "variables": {
@@ -424,10 +431,12 @@
         "name": "[variables('tollBoothFunctionAppName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('tollBoothFunctionsHostingPlanName'))]",
         "siteConfig": {
+          "netFrameworkVersion": "v10.0",
+          "use32BitWorkerProcess": false,
           "appSettings": [
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
-              "value": "dotnet"
+              "value": "dotnet-isolated"
             },
             {
               "name": "AzureWebJobsStorage",
@@ -435,7 +444,15 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "~3"
+              "value": "~4"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "[if(empty(parameters('tollBoothFunctionsPackageUrl')), '0', parameters('tollBoothFunctionsPackageUrl'))]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2018-05-01-preview').ConnectionString]"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
@@ -580,11 +597,15 @@
             },
             {
               "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "~20"
+              "value": "~22"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2018-05-01-preview').InstrumentationKey]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2018-05-01-preview').ConnectionString]"
             }
           ]
         },
