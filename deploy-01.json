@@ -634,7 +634,7 @@
     {
       "name": "[variables('vmName')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2020-06-01",
+      "apiVersion": "2022-11-01",
       "location": "[variables('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces/', variables('vmNetworkInterfaceName'))]"
@@ -646,17 +646,26 @@
         "storageProfile": {
           "osDisk": {
             "createOption": "FromImage",
+            "name": "[concat(variables('vmName'), '-osdisk')]",
+            "diskSizeGB": 128,
             "managedDisk": {
               "storageAccountType": "Premium_LRS"
             }
           },
           "imageReference": {
-            "publisher": "microsoftvisualstudio",
-            "offer": "visualstudiowsplustools",
-            "sku": "vs-2022-com-ws2025-datacenter-azure-gen2",
+            "publisher": "MicrosoftWindowsDesktop",
+            "offer": "windows-11",
+            "sku": "win11-24h2-pro",
             "version": "latest"
+          },
+          "dataDisks": []
+        },
+        "securityProfile": {
+          "securityType": "TrustedLaunch",
+          "uefiSettings": {
+            "secureBootEnabled": true,
+            "vTpmEnabled": true
           }
-
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -679,7 +688,7 @@
         {
           "name": "SetupLabVm",
           "type": "extensions",
-          "apiVersion": "2020-06-01",
+          "apiVersion": "2022-11-01",
           "location": "[variables('location')]",
           "properties": {
             "publisher": "Microsoft.Compute",
@@ -689,8 +698,8 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1",
-                "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/refs/heads/main/psscript-01.ps1"
+                "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/main/psscript-01.ps1",
+                "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1"
               ],
               "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File psscript-01.ps1', variables('cloudlabsCommon'),variables('Enable-CloudLabsEmbeddedShadow'))]"
             }

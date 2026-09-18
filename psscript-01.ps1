@@ -31,14 +31,13 @@ Param (
 
 Start-Transcript -Path C:\WindowsAzure\Logs\CloudLabsCustomScriptExtension.txt -Append
 [Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls
-[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls" 
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls"
 
 #Import Common Functions
-$path = $PSScriptRoot
-if ([string]::IsNullOrWhiteSpace($path)) { $path = (Get-Location).Path }
+$path = (Get-Location).Path
 $commonscriptpath = "$path" + "\cloudlabs-common\cloudlabs-windows-functions.ps1"
 . $commonscriptpath
-  
+
 # Run Imported functions from cloudlabs-windows-functions.ps1
 WindowsServerCommon
 
@@ -55,9 +54,10 @@ sleep 5
 # sleep 5
 
 #Download student files
-# NOTE: must be a PUBLIC repo/branch - the VM has no GitHub credentials.
-$codeFilesZipUrl = "https://github.com/CloudLabsAI-Azure/Infra_Monitoring_codefiles/archive/refs/heads/code-files.zip"
-$file = "C:\TollBooth_Clean.zip"
+# Source of truth: CloudLabsAI-Azure/Infra_Monitoring_codefiles (branch: guided-labs), published as a zip to blob storage.
+# The zip contains the lab files, including the prebuilt UploadImages.exe that students run in the lab.
+$codeFilesZipUrl = "https://experienceazure.blob.core.windows.net/templates/guided-labs/azure-infra-monitoring/dataset/infra-monitor-codefiles.zip"
+$file = "C:\infra-monitor-codefiles.zip"
 $destination = "C:\AzureInfraMonitoring"
 
 New-Item -ItemType directory -Path $destination -Force | Out-Null
@@ -66,30 +66,22 @@ try {
     $WebClient.DownloadFile($codeFilesZipUrl, $file)
     Write-Host "Downloaded student files from $codeFilesZipUrl"
 
-    #unziping folder
-    $shell = new-object -com shell.application
-    $zip = $shell.NameSpace($file)
-    foreach($item in $zip.items())
-    {
-    $shell.Namespace($destination).copyhere($item)
-    }
+    # Unzip the lab files
+    Expand-Archive -Path $file -DestinationPath $destination -Force
+
+    # Remove the mark of the web from the extracted files so that UploadImages.exe
+    # does not trigger a SmartScreen "Windows protected your PC" prompt.
+    Get-ChildItem -Path $destination -Recurse -File | Unblock-File -ErrorAction SilentlyContinue
+    Write-Host "Extracted student files to $destination"
 }
 catch {
     Write-Host "ERROR: could not download student files from $codeFilesZipUrl - $($_.Exception.Message)"
-    Write-Host "ERROR: $destination will be empty. Check the repo is public and the branch exists."
+    Write-Host "ERROR: $destination will be empty. Check the zip has been published to blob storage."
 }
 
-#Download and install .net runtime Framework 4.8
-$WebClient = New-Object System.Net.WebClient
-$WebClient.DownloadFile("https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/1f81f3962f75eff5d83a60abd3a3ec7b/ndp48-web.exe","C:\Packages\ndp48-web.exe") 
-C:\Packages\ndp48-web.exe /silent /install 
-
-sleep 5
-
-#Download and install .NET Core 3.1 Desktop Runtime
-choco install dotnetcore-sdk --version=3.1.426
-choco install visualstudio2019community --package-parameters "--add Microsoft.VisualStudio.Workload.NetCoreTools"
-
-sleep 5
+# NOTE: Visual Studio and the .NET Core 3.1 SDK are no longer installed.
+# The lab does not build or publish any code: the TollBooth functions are deployed to the
+# Function App by the ARM template, and UploadImages ships as a self-contained executable.
+# The Windows 11 image already includes .NET Framework 4.8.
 
 Stop-Transcript
