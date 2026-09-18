@@ -27,7 +27,7 @@
             "value": "GEN-PASSWORD"
         },
         "tollBoothFunctionsPackageUrl": {
-            "value": "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/main/tollbooth-functions.zip"
+            "value": "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/refs/heads/main/tollbooth-functions.zip"
         }
     }
 }
