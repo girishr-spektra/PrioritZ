@@ -74,7 +74,12 @@ The **scaffold**, not the finished extension. Writing the AL code is Challenge 0
 app.json                    manifest, id range 50100-50149, platform/application 28.0.0.0
 .vscode/launch.json         Sandbox publish profile, environmentName stamped at deploy time
 src/                        empty, participants write their AL files here
-.alpackages/                4 Microsoft symbol files, 28.3.52162.52273
+.alpackages/                5 symbol files:
+                              Microsoft_Application_28.3.52162.52273.app
+                              Microsoft_Base Application_28.3.52162.52273.app
+                              Microsoft_Business Foundation_28.3.52162.52273.app
+                              Microsoft_System Application_28.3.52162.52273.app
+                              System.app                    (platform, 28.0.54265)
 ```
 
 The symbols are bundled deliberately. Without them every participant runs
@@ -82,6 +87,24 @@ The symbols are bundled deliberately. Without them every participant runs
 environment and is a reliable twenty minute stall five minutes into the lab.
 They still work if the environment is a later 28.x, because `app.json` pins
 `28.0.0.0`.
+
+**All five files are required.** `System.app` is the platform package and is easy
+to miss, because it is the only one without a `Microsoft_` prefix and it does not
+come from the same place as the rest. Omit it and the first build fails with:
+
+```
+error AL1022: A package with publisher 'Microsoft', name 'System', and a version
+compatible with '28.0.0.0' could not be found in the package cache folders
+```
+
+It comes from `Microsoft.Platform.symbols` on Microsoft's public symbol feed:
+
+```
+https://dynamicssmb2.pkgs.visualstudio.com/DynamicsBCPublicFeeds/_packaging/MSSymbols/nuget/v3/index.json
+```
+
+Verified: the bundled set compiles a `tableextension` against `Purchase Header`
+with AL Language **18.0**, which is the version the VM installs today.
 
 ## Not in the template
 
