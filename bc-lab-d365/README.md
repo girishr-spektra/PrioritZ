@@ -176,6 +176,38 @@ which Getting Started tells participants to read:
 - Power Platform dev environment
 - Power Platform UAT environment
 
+## Lab guide hosting
+
+`docs/` holds a copy of the guide set for the express variant, and
+`masterdoc-express.json` points CloudLabs at it.
+
+This duplication exists for a specific reason. The guides live in
+[girishr-spektra/giri-hack](https://github.com/girishr-spektra/giri-hack), which
+is **private**, and CloudLabs serves lab content through
+`docs-api.cloudlabs.ai/repos/...`, a proxy that holds credentials for the
+`CloudLabsAI-Azure` org only. Measured behaviour:
+
+| Source | Through the docs-api proxy | Direct raw |
+|---|---|---|
+| `CloudLabsAI-Azure/hack-in-a-day-challenges` | 200 | 404, repo is private |
+| `girishr-spektra/giri-hack` | 500 | 404, repo is private |
+| `girishr-spektra/PrioritZ` | 500 | **200**, repo is public |
+
+So the only path that works today is a direct raw URL against this public repo,
+which is what `masterdoc-express.json` uses.
+
+**These copies will drift.** They are a snapshot for testing the express variant,
+not a second source of truth. The clean fix is to raise `easy-challenge1.md`
+upstream the same way the rest of the lab gets there, then point the manifest at
+`CloudLabsAI-Azure` through the proxy like `masterdoc.json` does, and delete
+`docs/` from this repo.
+
+To refresh the snapshot meanwhile:
+
+```bash
+cp ../giri-hack/d365-business-central-extension/{overview,getting-started,easy-challenge1,challenge-2,challenge-3,challenge-4,challenge-5}.md bc-lab-d365/docs/
+```
+
 ## Verifying a deployment
 
 On the VM after first logon:

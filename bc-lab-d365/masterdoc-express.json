@@ -1,0 +1,37 @@
+[
+  {
+    "Name": "Extending BC with Power Platform, AL, Copilot Studio - Hack in a Day (Express Challenge 01)",
+    "Language": "English",
+    "BaseURL": "https://github.com/girishr-spektra/PrioritZ",
+    "Files": [
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/main/bc-lab-d365/docs/overview.md",
+        "Order": 1
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/main/bc-lab-d365/docs/getting-started.md",
+        "Order": 2
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/main/bc-lab-d365/docs/easy-challenge1.md",
+        "Order": 3
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/main/bc-lab-d365/docs/challenge-2.md",
+        "Order": 4
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/main/bc-lab-d365/docs/challenge-3.md",
+        "Order": 5
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/main/bc-lab-d365/docs/challenge-4.md",
+        "Order": 6
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/girishr-spektra/PrioritZ/main/bc-lab-d365/docs/challenge-5.md",
+        "Order": 7
+      }
+    ]
+  }
+]
