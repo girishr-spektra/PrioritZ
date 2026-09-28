@@ -79,6 +79,44 @@ if ($starterOk) {
 }
 
 
+# ---- Lab payload: pre-built extension for the "easy" Challenge 01 variant ----
+# easy-challenge1.md has the participant upload this .app through Extension
+# Management instead of writing the AL themselves. It is compiled from exactly
+# the source printed in the standard challenge-1.md, including the permission
+# set, so it passes per-tenant extension validation.
+#
+# If you are running the standard (write-it-yourself) variant and do not want
+# the finished extension sitting on the VM, delete this block.
+Function Get-PrebuiltExtension
+{
+    $appName = "Contoso_BC Procurement Extension_1.0.0.0.app"
+    $appUrl  = "$RepoRawBase/assets/Contoso_BC%20Procurement%20Extension_1.0.0.0.app"
+    $appPath = Join-Path $AssetsDir $appName
+
+    if (-not (Test-Path $AssetsDir)) {
+        New-Item -ItemType Directory -Path $AssetsDir -Force | Out-Null
+    }
+
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+        try {
+            Invoke-WebRequest -Uri $appUrl -OutFile $appPath -UseBasicParsing -ErrorAction Stop
+            if ((Get-Item $appPath).Length -gt 5000) {
+                Write-Host "Downloaded pre-built extension to $appPath on attempt $attempt"
+                return
+            }
+            Write-Host "Attempt $attempt downloaded a suspiciously small file - retrying"
+        }
+        catch {
+            Write-Host "Attempt $attempt failed to download the pre-built extension : $($_.Exception.Message)"
+        }
+        Start-Sleep -Seconds 15
+    }
+
+    Write-Host "ERROR: failed to download the pre-built extension after 3 attempts"
+}
+Get-PrebuiltExtension
+
+
 # ---- Visual Studio Code and the AL Language extension ----
 # Getting Started lists both as pre-provisioned. Chocolatey is baked into the
 # jumpvm image. The extension installs into the user profile, which is why this
@@ -143,6 +181,7 @@ Write-Host "---- BC lab setup summary ----"
 Write-Host "Starter project present : $(Test-Path (Join-Path $ProjectDir 'app.json'))"
 Write-Host "Symbols present         : $(Test-Path (Join-Path $ProjectDir '.alpackages'))"
 Write-Host "Zip present             : $(Test-Path $ZipPath)"
+Write-Host "Pre-built .app present  : $(Test-Path (Join-Path $AssetsDir 'Contoso_BC Procurement Extension_1.0.0.0.app'))"
 Write-Host "BC environment expected : BC-ODL-$DeploymentID"
 
 # One-shot task, remove it so it does not fire again on the next logon.

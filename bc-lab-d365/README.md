@@ -106,6 +106,41 @@ https://dynamicssmb2.pkgs.visualstudio.com/DynamicsBCPublicFeeds/_packaging/MSSy
 Verified: the bundled set compiles a `tableextension` against `Purchase Header`
 with AL Language **18.0**, which is the version the VM installs today.
 
+## The pre-built extension
+
+`assets/Contoso_BC Procurement Extension_1.0.0.0.app` supports the alternate
+Challenge 01, [easy-challenge1.md](https://github.com/girishr-spektra/giri-hack/blob/main/d365-business-central-extension/easy-challenge1.md),
+where the participant uploads a finished extension instead of writing the AL.
+Stage 2 drops it at `C:ssets\`.
+
+It is compiled from exactly the source printed in the standard `challenge-1.md`,
+so the two variants produce an identical extension. Verified with AL Language
+18.0. `SymbolReference.json` in the package declares:
+
+```
+Tables            50100  Project Budget
+Pages             50100  Project Budget List
+                  50101  Purchase Order API
+                  50102  Project Budget API
+Codeunits         50100  Project Budget Mgmt
+TableExtensions   50100  Purchase Header Ext
+PageExtensions    50100  Purchase Order Ext
+PermissionSets    50100  BC Procurement
+```
+
+That last line matters. **Upload Extension validates permission sets and
+`Ctrl+F5` does not.** An otherwise-correct package without it is rejected with
+`PTE0004: Table 50100 'Project Budget' is missing a matching permission set`.
+
+The codeunit includes the Purchase Line and Purchase Header event subscribers, so
+committed spend stays current without anyone pressing **Recalculate Spend**.
+Without those, every figure the app and the agent report downstream is frozen at
+whatever it was when that button was last pressed.
+
+**Running the standard variant instead?** Delete the `Get-PrebuiltExtension`
+block from `scripts/logontask-01.ps1`, or participants will find the finished
+extension sitting next to the project they are meant to be building.
+
 ## Not in the template
 
 Automated separately, by arrangement:
